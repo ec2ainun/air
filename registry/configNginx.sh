@@ -2,8 +2,8 @@
 
 sudo apt update
 sudo apt install nginx
+sudo ufw allow 'Nginx Full'
 sudo ufw enable
-sudo ufw allow 'Nginx Full’
 
 sudo mkdir -p /var/www/registry.algo.fit/html
 sudo chown -R $USER:$USER /var/www/registry.algo.fit/html
@@ -16,4 +16,3 @@ sudo ln -s /etc/nginx/sites-available/registry.algo.fit /etc/nginx/sites-enabled
 
 sudo nginx -t
 sudo systemctl restart nginx
-
