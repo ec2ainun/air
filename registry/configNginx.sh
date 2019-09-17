@@ -11,7 +11,8 @@ sudo chmod -R 755 /var/www/registry.algo.fit
 cp -r registry.algo.fit/ /var/www/
 cp -r sites-available/ /etc/nginx/
 
-sudo ln -s /etc/nginx/sites-available/registry.algo.fit /etc/nginx/sites-enabled/
+cp sites-available/registry.algo.fit /etc/nginx/sites-enabled/
+cp nginx.conf /etc/nginx/
 
 sudo nginx -t
 sudo systemctl restart nginx
