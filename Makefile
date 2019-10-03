@@ -5,7 +5,7 @@ master-node:
 istio-setup:
 	cd cluster && bash istio.sh
 istio-deploy:
-	cf cluster/istio-1.3.0/
+	cd cluster/istio-1.3.0/
 	for i in install/kubernetes/helm/istio-init/files/crd*yaml; do kubectl apply -f $i; done
 	kubectl apply -f install/kubernetes/istio-demo.yaml
 	kubectl label namespace default istio-injection=enabled --overwrite
