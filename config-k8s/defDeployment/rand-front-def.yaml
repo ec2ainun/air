@@ -1,0 +1,90 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: front-py-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: front-api-py
+  template:
+    metadata:
+      labels:
+        app: front-api-py
+        svc: rand-front-api
+        env: prod
+    spec:
+      containers:
+        - name: front-py
+          image: ec2ainun/usvc-py:v1
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 2000
+          env:
+            - name: SERVICE_NAME
+              value: "random-svc-python"
+            - name: UPSTREAM_URI
+              value: "http://middleware-svc/"
+            - name: PORT
+              value: "2000"
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: front-no-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: front-api-no
+  template:
+    metadata:
+      labels:
+        app: front-api-no
+        svc: rand-front-api
+        env: prod
+    spec:
+      containers:
+        - name: front-no
+          image: ec2ainun/usvc-no:v1
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 2000
+          env:
+            - name: SERVICE_NAME
+              value: "random-svc-node"
+            - name: UPSTREAM_URI
+              value: "http://middleware-svc/"
+            - name: PORT
+              value: "2000"
+
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: front-go-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: front-api-go
+  template:
+    metadata:
+      labels:
+        app: front-api-go
+        svc: rand-front-api
+        env: prod
+    spec:
+      containers:
+        - name: front-go
+          image: ec2ainun/usvc-go:v1
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 2000
+          env:
+            - name: SERVICE_NAME
+              value: "random-svc-golang"
+            - name: UPSTREAM_URI
+              value: "http://middleware-svc/"
+            - name: PORT
+              value: "2000"

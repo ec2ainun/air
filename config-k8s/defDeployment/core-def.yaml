@@ -1,0 +1,64 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: core-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: core-api
+  template:
+    metadata:
+      labels:
+        app: core-api
+        svc: core-api
+        env: prod
+    spec:
+      imagePullSecrets:
+        - name: algo-cred
+      containers:
+        - name: core-go
+          image: docker.algo.fit/ec2ainun/usvc-go:v1
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 2000
+          env:
+            - name: SERVICE_NAME
+              value: "core-svc-golang"
+            - name: UPSTREAM_URI
+              value: "http://worldtimeapi.org/api/timezone/Asia/Jakarta/"
+            - name: PORT
+              value: "2000"
+
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: load-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: load-api
+  template:
+    metadata:
+      labels:
+        app: load-api
+        svc: core-api
+        env: test
+    spec:
+      imagePullSecrets:
+        - name: algo-cred
+      containers:
+        - name: load-go
+          image: docker.algo.fit/ec2ainun/usvc-go:v1
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 2000
+          env:
+            - name: SERVICE_NAME
+              value: "load-svc-golang"
+            - name: UPSTREAM_URI
+              value: "http://clock-svc/"
+            - name: PORT
+              value: "2000"

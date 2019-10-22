@@ -1,0 +1,25 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: route-middle
+spec:
+  hosts:
+    - middleware-svc
+  http:
+    - match:
+        - headers:
+            x-dev-user:
+              exact: betaUser
+      route:
+        - destination:
+            host: middleware-svc
+            subset: canary
+    - route:
+        - destination:
+            host: middleware-svc
+            subset: canary
+          weight: 20
+        - destination:
+            host: middleware-svc
+            subset: prod
+          weight: 80

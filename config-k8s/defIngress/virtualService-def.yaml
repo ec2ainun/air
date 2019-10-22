@@ -1,0 +1,15 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: route-front
+spec:
+  hosts:
+    - usvc.algo.fit
+  gateways:
+    - front-gateway #this is refferer gateway to get traffic to
+  http:
+    - route:
+        - destination:
+            host: rand-front-svc
+            port:
+              number: 80
