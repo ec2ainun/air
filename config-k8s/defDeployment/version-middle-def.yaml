@@ -1,0 +1,89 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: middle-canary-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: middle-canary-api
+  template:
+    metadata:
+      labels:
+        app: middle-canary-api
+        svc: middle-api
+        env: canary
+    spec:
+      containers:
+        - name: middle-go
+          image: ec2ainun/usvc-go:v1
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 2000
+          env:
+            - name: SERVICE_NAME
+              value: "canary-svc-golang"
+            - name: UPSTREAM_URI
+              value: "http://core-svc/"
+            - name: PORT
+              value: "2000"
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: middle-prod-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: middle-prod-api
+  template:
+    metadata:
+      labels:
+        app: middle-prod-api
+        svc: middle-api
+        env: prod
+    spec:
+      containers:
+        - name: middle-py
+          image: ec2ainun/usvc-py:v1
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 2000
+          env:
+            - name: SERVICE_NAME
+              value: "prod-svc-python"
+            - name: UPSTREAM_URI
+              value: "http://core-svc/"
+            - name: PORT
+              value: "2000"
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: middle-dev-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: middle-dev-api
+  template:
+    metadata:
+      labels:
+        app: middle-dev-api
+        svc: middle-api
+        env: dev
+    spec:
+      containers:
+        - name: middle-no
+          image: ec2ainun/usvc-no:v1
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 2000
+          env:
+            - name: SERVICE_NAME
+              value: "dev-svc-node"
+            - name: UPSTREAM_URI
+              value: "http://core-svc/"
+            - name: PORT
+              value: "2000"

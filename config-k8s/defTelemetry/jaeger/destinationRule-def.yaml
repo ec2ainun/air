@@ -1,0 +1,10 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: jaeger-distination
+  namespace: istio-system
+spec:
+  host: jaeger
+  trafficPolicy:
+    tls:
+      mode: DISABLE

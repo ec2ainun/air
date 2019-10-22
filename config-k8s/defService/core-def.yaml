@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: core-svc
+spec:
+  type: ClusterIP
+  selector:
+    svc: core-api
+  ports:
+    - port: 80
+      targetPort: 2000
+      name: http

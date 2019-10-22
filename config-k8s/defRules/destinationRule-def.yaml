@@ -1,0 +1,50 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: rand-front-dest
+spec:
+  host: rand-front-svc
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL
+  subsets:
+    - name: prod
+      labels:
+        env: prod
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: middleware-dest
+spec:
+  host: middleware-svc
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL
+  subsets:
+    - name: prod
+      labels:
+        env: prod
+    - name: canary
+      labels:
+        env: canary
+    - name: dev
+      labels:
+        env: dev
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: core-dest
+spec:
+  host: core-svc
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL
+  subsets:
+    - name: prod
+      labels:
+        env: prod
+    - name: test
+      labels:
+        env: test
