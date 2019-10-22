@@ -1,0 +1,12 @@
+config:
+  target: "https://usvc.algo.fit"
+  phases:
+    - duration: 600
+      arrivalRate: 50
+  defaults:
+    headers:
+      x-dev-user: "stressTest"
+scenarios:
+  - flow:
+      - get:
+          url: "/"
