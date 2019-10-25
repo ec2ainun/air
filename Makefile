@@ -9,11 +9,14 @@ all: docker-reg code-py-docker code-go-docker code-no-docker code-time-docker \
 	rules-prod rules-dev rules-canary rules-beta rules-retry rules-stress rules-current \
 	tele-grafana tele-prometheus tele-kiali tele-jaeger \
 	load-setup stress-tes
+
 build-docker: code-py-docker code-go-docker code-no-docker code-time-docker
-tag-docker: tag-py-docker tag-go-docker tag-no-docker tag-time-docker
+
 tag-dockerHub: hubTag-py-docker hubTag-go-docker hubTag-no-docker hubTag-time-docker
-push-docker: push-py-docker push-go-docker push-no-docker push-time-docker
 push-dockerHub: hubPush-py-docker hubPush-go-docker hubPush-no-docker hubPush-time-docker
+
+tag-docker: tag-py-docker tag-go-docker tag-no-docker tag-time-docker
+push-docker: push-py-docker push-go-docker push-no-docker push-time-docker
 
 docker-reg :
 	cd setup/registry && bash config.sh && cd ../../
@@ -96,23 +99,48 @@ istio-deploy :
 
 helm-setup:
 	cd setup/cluster && bash helm.sh && cd ../../
+
 helm-add-istio:
 	helm repo add istio.io https://storage.googleapis.com/istio-release/releases/1.3.0/charts/
 	helm repo list
 helm-crd-istio:
 	helm install --name istio-init --namespace istio-system istio.io/istio-init
+
 helm-install-istio:
 	helm install --name istio --namespace istio-system istio.io/istio
-helm-istio-tele:
-	helm upgrade istio --namespace istio-system \
-		--set grafana.enabled=true \
+helm-istio-zipkin:
+	helm install --name istio --namespace istio-system \
 		--set kiali.enabled=true \
+		--set grafana.enabled=true \
 		--set prometheus.enabled=true \
-		--set pilot.traceSampling=100 \
-		--set kiali.dashboard.jaegerURL=http://jaeger-query:16686 \
-		--set kiali.dashboard.grafanaURL=http://grafana:3000 \
-		--set global.tracer.zipkin.address=jaeger-query.istio-system:16686 \
+		--set pilot.traceSampling=100.0 \
+		--set servicegraph.enabled=true \
+		--set tracing.provider=zipkin \
+		--set global.tracer.zipkin.address=zipkin.istio-system:9411 \
+		--set global.enableTracing=true \
 		--set tracing.enabled=true istio.io/istio
+helm-istio-jaeger:
+	helm install --name istio --namespace istio-system \
+		--set kiali.enabled=true \
+		--set grafana.enabled=true \
+		--set prometheus.enabled=true \
+		--set pilot.traceSampling=100.0 \
+		--set servicegraph.enabled=true \
+		--set global.enableTracing=true \
+		--set tracing.enabled=true istio.io/istio
+
+reset:
+	kubectl delete svc --all
+	kubectl delete deploy --all
+	kubectl delete VirtualService --all
+	kubectl delete DestinationRule --all
+	kubectl delete Gateway --all
+	kubectl delete ServiceEntry --all
+	kubectl delete ns istio-system
+	helm del --purge istio-init
+	helm del --purge istio
+
+start : istio-inject deployment service ingress egress rules-current istio-tele
 
 istio-inject :
 	kubectl label namespace default istio-injection=enabled --overwrite
@@ -143,7 +171,7 @@ rules-current :
 	kubectl apply -f config-k8s/defRules/destinationRule-def.yaml
 	kubectl apply -f config-k8s/defRules/currentRule-def.yaml
 
-istio-tele: tele-grafana tele-prometheus tele-kiali tele-jaeger
+istio-tele: tele-grafana tele-prometheus tele-kiali tele-jaeger tele-tracing tele-zipkin
 tele-grafana :
 	kubectl apply -f config-k8s/defTelemetry/grafana/
 tele-prometheus :
@@ -152,8 +180,12 @@ tele-kiali :
 	kubectl apply -f config-k8s/defTelemetry/kiali/
 tele-jaeger :
 	kubectl apply -f config-k8s/defTelemetry/jaeger/
+tele-tracing :
+	kubectl apply -f config-k8s/defTelemetry/tracing/
+tele-zipkin :
+	kubectl apply -f config-k8s/defTelemetry/zipkin/
 
 load-setup :
 	bash setup/test/setup-artillery.sh
-stress-tes :
+tes :
 	artillery run setup/test/stressTes.yaml
