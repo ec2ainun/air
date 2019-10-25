@@ -1,0 +1,19 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: zipkin-vs
+  namespace: istio-system
+spec:
+  hosts:
+    - zipkin.usvc.algo.fit
+  gateways:
+    - zipkin-gateway
+  http:
+    - match:
+        - uri:
+            prefix: /
+      route:
+        - destination:
+            host: zipkin
+            port:
+              number: 9411
