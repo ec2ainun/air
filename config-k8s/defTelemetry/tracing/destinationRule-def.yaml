@@ -1,10 +1,10 @@
 apiVersion: networking.istio.io/v1alpha3
 kind: DestinationRule
 metadata:
-  name: jaeger-distination
+  name: tracing-distination
   namespace: istio-system
 spec:
-  host: jaeger-query
+  host: tracing
   trafficPolicy:
     tls:
       mode: DISABLE
