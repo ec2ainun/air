@@ -1,0 +1,6 @@
+**/node_modules/
+**/.ipynb_checkpoints/
+**/uploads
+**/vendor
+**/env/
+**.DS_Store
