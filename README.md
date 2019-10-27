@@ -162,7 +162,7 @@ quick experimental with different istio telemetry
 ```
 * **Note** : this only work after you are install helm, already have istio repo in helm, artillery, and k8s cluster
 
-### **Demo**
+## **DEMO**
 
 **Gateway(istio) -> {VirtualService(istio) -> DestinationRule(istio) -> Service(k8s)} -> Deployment(Pods)**
 
@@ -186,10 +186,24 @@ take an example we invoke https://usvc.algo.fit/,
     * if match label **'env: prod'** it will invoke http://worldtimeapi.org/api/timezone/Asia/Jakarta/ to get current time.
     * if match label **'env: test'** it will invoke **clock-svc(Service-ClusterIP)** and pass it into **clock-deployment(Deployment)** to return current time.
 
+## **CONFUSE?**
+That's **GREAT!**, it's mean you are trying to understand. let's just try learn by doing.
+
+* below an example **without** kind of header, it will giving back 20% canary and 80% prod from overall traffic for middle-deployment respond and egress traffic from worldtimeapi.org which is invoke by core-deployment :
+![can't load current gif](/explain/current.gif)
+---
+* below an example with **'x-dev-user: betaUser'**, it will always routing to dev middle-deployment and giving back current time from core-deployment invoke clock-svc->clock-deployment :
+![can't load betaUser gif](/explain/betaUser.gif)
+---
+* below an example with **'x-dev-user: stressTest'**, it will giving back 20% canary and 80% prod from overall traffic for middle-deployment respond and also giving back current time from core-deployment invoke clock-svc->clock-deployment :
+![can't load stressTest gif](/explain/stressTest.gif)
+---
+* bonus!, how to trace a request :
+![can't load tracing gif](/explain/tracing.gif)
+---
 
 ## **CREDIT**
-
-Inpired from [Sandeep Dinesh](https://github.com/thesandlord)'s amazing talk
+Inspired from [Sandeep Dinesh](https://github.com/thesandlord)'s Amazing Talk
 
 
 ## **LICENSE**
